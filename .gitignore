@@ -1,0 +1,22 @@
+.env
+.idea/
+.vscode/
+.DS_Store
+
+# Go
+bin/
+coverage.out
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+*.egg-info/
+
+# Web
+node_modules/
+dist/
+*.log
+*.tsbuildinfo

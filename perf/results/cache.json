@@ -1,0 +1,173 @@
+{
+    "metrics": {
+        "data_sent": {
+            "count": 1764866,
+            "rate": 59057.33322612245
+        },
+        "http_reqs": {
+            "count": 6003,
+            "rate": 200.8771041860476
+        },
+        "iteration_duration": {
+            "p(90)": 2.761192,
+            "p(95)": 3.05933,
+            "p(99)": 3.807674,
+            "avg": 1.927309358106986,
+            "min": 1.005387,
+            "med": 1.783689,
+            "max": 8.687427
+        },
+        "http_req_connecting": {
+            "avg": 0.002030121939030485,
+            "min": 0,
+            "med": 0,
+            "max": 0.947242,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 6003,
+            "thresholds": {
+                "rate<0.01": false
+            },
+            "value": 0
+        },
+        "checks": {
+            "passes": 6003,
+            "fails": 0,
+            "thresholds": {
+                "rate>0.99": false
+            },
+            "value": 1
+        },
+        "http_req_duration": {
+            "p(99)": 3.3506077799999945,
+            "avg": 1.7718736430118294,
+            "min": 0.087772,
+            "med": 1.644829,
+            "max": 82.214388,
+            "p(90)": 2.4966766000000002,
+            "p(95)": 2.7511379,
+            "thresholds": {
+                "p(99)<200": false,
+                "p(95)<100": false
+            }
+        },
+        "http_req_duration{expected_response:true}": {
+            "max": 82.214388,
+            "p(90)": 2.4966766000000002,
+            "p(95)": 2.7511379,
+            "p(99)": 3.3506077799999945,
+            "avg": 1.7718736430118294,
+            "min": 0.087772,
+            "med": 1.644829
+        },
+        "http_req_waiting": {
+            "med": 1.48457,
+            "max": 81.674779,
+            "p(90)": 2.2900478,
+            "p(95)": 2.5319568,
+            "p(99)": 3.1050770199999964,
+            "avg": 1.6117680834582728,
+            "min": 0
+        },
+        "iterations": {
+            "rate": 200.8101786141049,
+            "count": 6001
+        },
+        "http_req_tls_handshaking": {
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "p(99)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0
+        },
+        "vus_max": {
+            "min": 30,
+            "max": 30,
+            "value": 30
+        },
+        "http_req_sending": {
+            "p(90)": 0.0740816,
+            "p(95)": 0.08952499999999998,
+            "p(99)": 0.13144147999999942,
+            "avg": 0.044855173579876575,
+            "min": 0.00695,
+            "med": 0.038156,
+            "max": 1.709907
+        },
+        "http_req_receiving": {
+            "p(99)": 0.3176383799999997,
+            "avg": 0.11525038597367966,
+            "min": 0.026129,
+            "med": 0.095572,
+            "max": 1.043351,
+            "p(90)": 0.202986,
+            "p(95)": 0.23204029999999998
+        },
+        "vus": {
+            "value": 0,
+            "min": 0,
+            "max": 1
+        },
+        "data_received": {
+            "rate": 51234.70428681269,
+            "count": 1531095
+        },
+        "http_req_blocked": {
+            "max": 2.838372,
+            "p(90)": 0.009078,
+            "p(95)": 0.0112456,
+            "p(99)": 0.06439445999999947,
+            "avg": 0.009444472930201564,
+            "min": 0.00267,
+            "med": 0.004331
+        }
+    },
+    "setup_data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMSwiZXhwIjoxNzg0MTk5MDMxLCJpYXQiOjE3ODQxMTI2MzF9.tg1-siASiJMAVfHtrwCpkP629vSxUEdp5TqdAEdIzck",
+        "vehicleId": 11
+    },
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "setup": {
+                "checks": {
+                    "压测用户创建成功": {
+                        "fails": 0,
+                        "name": "压测用户创建成功",
+                        "path": "::setup::压测用户创建成功",
+                        "id": "9ed99eff584b82505889d02779afed54",
+                        "passes": 1
+                    },
+                    "压测车辆创建成功": {
+                        "fails": 0,
+                        "name": "压测车辆创建成功",
+                        "path": "::setup::压测车辆创建成功",
+                        "id": "c14b08e3e07893fd231bc7611887584d",
+                        "passes": 1
+                    }
+                },
+                "name": "setup",
+                "path": "::setup",
+                "id": "5c0f8025f7e0b6654089e5b00e950f1a",
+                "groups": {}
+            }
+        },
+        "checks": {
+            "缓存查询返回 200": {
+                "name": "缓存查询返回 200",
+                "path": "::缓存查询返回 200",
+                "id": "e2d40aee63f4a99565cc981023c7fbd1",
+                "passes": 6001,
+                "fails": 0
+            }
+        },
+        "name": "",
+        "path": ""
+    }
+}

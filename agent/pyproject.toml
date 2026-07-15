@@ -1,0 +1,20 @@
+[project]
+name = "autopilot-agent"
+version = "0.1.0"
+description = "AutoPilot 智能座舱 Agent Worker"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi==0.116.1",
+  "uvicorn[standard]==0.35.0",
+  "aio-pika==9.5.7",
+  "httpx==0.28.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.4.1", "ruff==0.12.4"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100

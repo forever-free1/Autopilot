@@ -1,0 +1,109 @@
+name: autopilot
+
+services:
+  backend:
+    build: ./backend
+    environment:
+      BACKEND_PORT: 8080
+      MYSQL_DSN: ${MYSQL_USER:-autopilot}:${MYSQL_PASSWORD:-autopilot_dev}@tcp(mysql:3306)/${MYSQL_DATABASE:-autopilot}?charset=utf8mb4&parseTime=True&loc=Local
+      REDIS_ADDR: redis:6379
+      JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-me}
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-autopilot}:${RABBITMQ_PASSWORD:-autopilot_dev}@rabbitmq:5672/
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN:-local-agent-callback-token}
+      BACKEND_CALLBACK_URL: http://backend:8080
+      GIN_MODE: release
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  agent:
+    build: ./agent
+    ports:
+      - "${AGENT_PORT:-8000}:8000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  agent-worker:
+    build: ./agent
+    command: ["python", "-m", "app.worker"]
+    environment:
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:-autopilot}:${RABBITMQ_PASSWORD:-autopilot_dev}@rabbitmq:5672/
+      INTERNAL_TOKEN: ${INTERNAL_TOKEN:-local-agent-callback-token}
+      RAG_PROVIDER: ${RAG_PROVIDER:-mock}
+      RAGFLOW_BASE_URL: ${RAGFLOW_BASE_URL:-}
+      RAGFLOW_API_KEY: ${RAGFLOW_API_KEY:-}
+      RAGFLOW_DATASET_IDS: ${RAGFLOW_DATASET_IDS:-}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+  web:
+    build: ./web
+    ports:
+      - "${WEB_PORT:-5173}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-autopilot}
+      MYSQL_USER: ${MYSQL_USER:-autopilot}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-autopilot_dev}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_dev}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:4.1-management-alpine
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-autopilot}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-autopilot_dev}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:
