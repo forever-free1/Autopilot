@@ -15,7 +15,7 @@
 
 - `backend/`：Go + Gin 业务 API
 - `agent/`：Python + FastAPI Agent Worker
-- `web/`：React + TypeScript 演示控制台
+- `web/`：Next.js + React + TypeScript 智能座舱 Agent 管理与演示平台
 - `docker-compose.yml`：MySQL、Redis、RabbitMQ 与三个应用服务
 
 ## 快速启动

@@ -95,6 +95,16 @@ func (h Handler) listVehicles(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"items": vehicles})
 }
 
+// getVehicle 返回属于当前用户的车辆详情，前端不需要组合多个内部数据源。
+func (h Handler) getVehicle(c *gin.Context) {
+	var vehicle model.Vehicle
+	if err := h.DB.Preload("Status").Where("id = ? AND user_id = ?", c.Param("id"), c.GetUint64(userIDKey)).First(&vehicle).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "车辆不存在"})
+		return
+	}
+	c.JSON(http.StatusOK, vehicle)
+}
+
 func (h Handler) getVehicleStatus(c *gin.Context) {
 	vehicleID, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
