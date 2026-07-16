@@ -42,5 +42,12 @@ func NewApplicationRouter(db *gorm.DB, cache *redis.Client, jwtSecret, internalT
 	authorized.GET("/agent/tasks/:id", h.getTask)
 	authorized.GET("/agent/tasks/:id/events", h.streamTaskEvents)
 	authorized.GET("/tool-calls", h.listToolCalls)
+	authorized.GET("/conversations", h.listConversations)
+	authorized.POST("/conversations", h.createConversation)
+	authorized.GET("/conversations/:id", h.getConversation)
+	authorized.POST("/conversations/:id/messages", h.createConversationMessage)
+	authorized.POST("/diagnostics", h.createDiagnostic)
+	authorized.POST("/trips/plan", h.createTripPlan)
+	authorized.GET("/trips", h.listTripPlans)
 	return router
 }

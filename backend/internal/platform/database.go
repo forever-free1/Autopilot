@@ -19,7 +19,7 @@ func Connect(cfg config.Config) (*gorm.DB, *redis.Client, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("连接 MySQL: %w", err)
 	}
-	if err := db.AutoMigrate(&model.User{}, &model.Vehicle{}, &model.VehicleStatus{}, &model.AgentTask{}, &model.ToolCall{}); err != nil {
+	if err := db.AutoMigrate(&model.User{}, &model.Vehicle{}, &model.VehicleStatus{}, &model.AgentTask{}, &model.ToolCall{}, &model.Conversation{}, &model.ConversationMessage{}, &model.TripPlan{}); err != nil {
 		return nil, nil, fmt.Errorf("迁移数据库: %w", err)
 	}
 

@@ -60,3 +60,41 @@ type ToolCall struct {
 	Success   bool      `gorm:"not null" json:"success"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+// Conversation 保存用户与 Agent 的会话元数据，消息与异步任务保持松耦合。
+type Conversation struct {
+	ID        string                `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID    uint64                `gorm:"not null;index" json:"user_id"`
+	VehicleID uint64                `gorm:"not null;index" json:"vehicle_id"`
+	Title     string                `gorm:"size:120;not null" json:"title"`
+	Messages  []ConversationMessage `gorm:"foreignKey:ConversationID" json:"messages,omitempty"`
+	CreatedAt time.Time             `json:"created_at"`
+	UpdatedAt time.Time             `json:"updated_at"`
+}
+
+// ConversationMessage 只保存用户可见内容；Tool Trace 继续由 ToolCall 表承载。
+type ConversationMessage struct {
+	ID             uint64    `gorm:"primaryKey" json:"id"`
+	ConversationID string    `gorm:"type:char(36);not null;index" json:"conversation_id"`
+	Role           string    `gorm:"size:16;not null" json:"role"`
+	Content        string    `gorm:"type:text;not null" json:"content"`
+	TaskID         *string   `gorm:"type:char(36);index" json:"task_id,omitempty"`
+	CreatedAt      time.Time `json:"created_at"`
+}
+
+// TripPlan 保存可复现的行程规划结果，地图坐标使用 WGS84。
+type TripPlan struct {
+	ID             string    `gorm:"type:char(36);primaryKey" json:"id"`
+	UserID         uint64    `gorm:"not null;index" json:"user_id"`
+	VehicleID      uint64    `gorm:"not null;index" json:"vehicle_id"`
+	Origin         string    `gorm:"size:160;not null" json:"origin"`
+	Destination    string    `gorm:"size:160;not null" json:"destination"`
+	DistanceKM     float64   `json:"distance_km"`
+	DurationMinute int       `json:"duration_minutes"`
+	EnergyPercent  float64   `json:"energy_percent"`
+	RemainingRange float64   `json:"remaining_range_km"`
+	NeedCharge     bool      `json:"need_charge"`
+	Advice         string    `gorm:"type:text" json:"advice"`
+	WaypointsJSON  string    `gorm:"type:json" json:"waypoints"`
+	CreatedAt      time.Time `json:"created_at"`
+}
