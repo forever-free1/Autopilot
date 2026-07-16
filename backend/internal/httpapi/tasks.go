@@ -106,6 +106,21 @@ func (h Handler) receiveTaskEvent(c *gin.Context) {
 				return err
 			}
 		}
+		// 若任务来自会话消息，在终态回调中同步保存 Agent 可见回复，确保历史会话可完整回放。
+		if event.Status == "finished" || event.Status == "failed" {
+			var source model.ConversationMessage
+			if err := tx.Where("task_id = ? AND role = ?", task.ID, "user").First(&source).Error; err == nil {
+				var count int64
+				tx.Model(&model.ConversationMessage{}).Where("task_id = ? AND role = ?", task.ID, "assistant").Count(&count)
+				if count == 0 {
+					content := event.Result
+					if event.Status == "failed" { content = event.ErrorMessage }
+					reply := model.ConversationMessage{ConversationID: source.ConversationID, Role: "assistant", Content: content, TaskID: &task.ID}
+					if err := tx.Create(&reply).Error; err != nil { return err }
+					tx.Model(&model.Conversation{}).Where("id = ?", source.ConversationID).Update("updated_at", now)
+				}
+			}
+		}
 		// 工具结果与任务状态同事务提交，避免 Trace 成功但车辆状态未更新。
 		if len(event.VehiclePatch) > 0 {
 			return tx.Model(&model.VehicleStatus{}).Where("vehicle_id = ?", task.VehicleID).Updates(event.VehiclePatch).Error

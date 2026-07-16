@@ -6,7 +6,7 @@ from dataclasses import asdict
 import aio_pika
 import httpx
 
-from app.tools import execute_command
+from app.tools import execute_command, plan_charging_route
 from app.diagnosis import diagnose
 from app.rag import create_provider
 
@@ -30,6 +30,8 @@ async def handle(message: aio_pika.IncomingMessage) -> None:
             if any(keyword in task["command"] for keyword in ("故障", "诊断", "维修")):
                 calls, result = await diagnose(task["command"], create_provider())
                 patch = {}
+            elif any(keyword in task["command"] for keyword in ("充电站", "规划路线", "启动导航")):
+                calls, patch, result = plan_charging_route(task["command"])
             else:
                 calls, patch, result = execute_command(task["command"])
             await callback(

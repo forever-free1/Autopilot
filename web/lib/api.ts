@@ -35,11 +35,14 @@ export async function watchTask(id:string,onTask:(task:AgentTask)=>void){
 export async function getDashboardSummary(){ await authenticate(); return request<DashboardSummary>("/dashboard/summary"); }
 export async function listTasks(){ await authenticate(); return request<{items:AgentTask[];total:number;page:number;page_size:number}>("/agent/tasks?page_size=50"); }
 export async function listVehicles(){ await authenticate(); const data=await request<{items:unknown[]}>("/vehicles"); return data.items.map(item=>vehicleSchema.parse(item)); }
+export async function getVehicle(id:number){await authenticate();return vehicleSchema.parse(await request(`/vehicles/${id}`))}
 export async function createDiagnostic(vehicleId:number,symptom:string){await authenticate();return request<AgentTask>("/diagnostics",{method:"POST",body:JSON.stringify({vehicle_id:vehicleId,symptom})})}
 export type TripPlan={id:string;vehicle_id:number;origin:string;destination:string;distance_km:number;duration_minutes:number;energy_percent:number;remaining_range_km:number;need_charge:boolean;advice:string;waypoints:string;created_at:string};
 export async function createTripPlan(vehicleId:number,origin:string,destination:string){await authenticate();return request<TripPlan>("/trips/plan",{method:"POST",body:JSON.stringify({vehicle_id:vehicleId,origin,destination})})}
 export async function listTripPlans(){await authenticate();return request<{items:TripPlan[]}>("/trips")}
 export type Conversation={id:string;vehicle_id:number;title:string;created_at:string;updated_at:string};
+export type ConversationMessage={id:number;role:"user"|"assistant";content:string;task_id?:string;created_at:string};
 export async function listConversations(){await authenticate();return request<{items:Conversation[]}>("/conversations")}
 export async function createConversation(vehicleId:number,title:string){await authenticate();return request<Conversation>("/conversations",{method:"POST",body:JSON.stringify({vehicle_id:vehicleId,title})})}
+export async function getConversation(id:string){await authenticate();return request<Conversation&{messages:ConversationMessage[]}>(`/conversations/${id}`)}
 export async function sendConversationMessage(conversationId:string,content:string){await authenticate();return request<{task:AgentTask}>(`/conversations/${conversationId}/messages`,{method:"POST",body:JSON.stringify({content})})}

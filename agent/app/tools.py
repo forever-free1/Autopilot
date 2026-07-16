@@ -47,3 +47,26 @@ def execute_command(command: str) -> tuple[list[ToolResult], dict[str, Any], str
         raise ValueError("暂不支持该指令，请尝试调节温度或控制座椅加热")
     names = "、".join(call.tool_name for call in calls)
     return calls, patch, f"指令执行完成，已调用 {names}。"
+
+
+def plan_charging_route(command: str) -> tuple[list[ToolResult], dict[str, Any], str]:
+    """以确定性工具链完成充电站规划，保证离线面试 Demo 可重复执行。"""
+    calls: list[ToolResult] = []
+
+    def record(name: str, inputs: dict[str, Any], output: dict[str, Any]) -> None:
+        started = time.perf_counter()
+        calls.append(ToolResult(name, inputs, output, int((time.perf_counter() - started) * 1000)))
+
+    record("get_vehicle_status", {}, {"battery": 72, "remaining_range_km": 386, "location": "上海张江"})
+    record(
+        "search_charging_stations",
+        {"radius_km": 10},
+        {"stations": [{"name": "张江超级充电站", "distance_km": 1.2, "available": 8}]},
+    )
+    record(
+        "calculate_route",
+        {"destination": "张江超级充电站"},
+        {"distance_km": 1.2, "duration_minutes": 6, "energy_percent": 1},
+    )
+    record("start_navigation", {"destination": "张江超级充电站"}, {"started": True})
+    return calls, {}, "已找到最近的张江超级充电站，距离 1.2 km，当前续航充足，路线已规划并启动导航。"
